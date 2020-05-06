@@ -31,6 +31,7 @@
     "react-router-dom": "^5.1.2",
     "react-static-google-map": "^0.6.2",
     "slugify": "^1.4.0",
+    "tailwindcss": "^1.4.5",
     "use-global-hook": "^0.1.12",
     "victory": "^34.1.3"
   },

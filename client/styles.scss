@@ -1,3 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.home {
+  p {
+    @apply mb-8;
+  }
+}
+
 .calendar .day {
   width: (100% / 7);
   &.matched {

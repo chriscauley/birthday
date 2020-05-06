@@ -21,5 +21,5 @@ export default withConfig(function Home(props) {
     )
   }
   props.config.setSimulation(simulation)
-  return <div className="w-2/3">{simulation.render(simulation)}</div>
+  return <div className="w-2/3 home">{simulation.render(simulation)}</div>
 })
