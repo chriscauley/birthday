@@ -2,26 +2,25 @@ import React from 'react'
 import { range } from 'lodash'
 import { VictoryBar, VictoryChart } from 'victory'
 import slugify from 'slugify'
+import classnames from 'classnames'
 
 import * as math from './math'
 
-const Calendar = (props) => {
-  const { data = {} } = props
-  const { room = {} } = data
+const MonthCalendar = (props) => {
+  const { data = {}, offset = 0, className } = props
+  const { room = {}, done } = data
   const days = range(1, props.days + 1)
 
   return (
-    <div className="flex flex-wrap calendar">
+    <div className={classnames('calendar', className)}>
+      {range(offset).map((i) => (
+        <div key={i} className="day opacity-0" />
+      ))}
       {days.map((d) => (
-        <div
-          className={`day border h-16 p-1 text-right ${
-            d === data.done ? 'matched' : ''
-          }`}
-          key={d}
-        >
-          {d}
+        <div className={classnames('day', { matched: d === done })} key={d}>
+          <span className="number">{d}</span>
           {room[d] && (
-            <div className="text-center text-3xl">
+            <div className="people">
               <i className="fa fa-user" />
               {d === data.done && <i className="fa fa-user" />}
             </div>
@@ -67,7 +66,7 @@ Step({
           simplicity we will first look at the odds of being born on the same
           day of month (30 possible birthdays).
         </p>
-        <Calendar days={30} data={simulation.data} />
+        <MonthCalendar days={30} data={simulation.data} offset={2} />
         {simulation.data && (
           <div>
             <div>

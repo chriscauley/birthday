@@ -8,9 +8,27 @@
   }
 }
 
-.calendar .day {
-  width: (100% / 7);
-  &.matched {
-    box-shadow: inset 0 0 10px 4px rgba(255, 0, 0,1);
+.calendar {
+  @apply flex flex-wrap;
+  .day {
+    @apply border h-16 p-1 text-right;
+    width: (100% / 7);
+    &.matched {
+      box-shadow: inset 0 0 10px 4px rgba(255, 0, 0,1);
+    }
+  }
+  .people {
+    @apply text-center text-3xl;
+  }
+  &.small {
+    width: 14rem;
+    .day {
+      width: 2rem;
+      @apply flex items-center p-0 h-4;
+      .number { display: none; }
+    }
+    .people {
+      @apply text-base w-full;
+    }
   }
 }
