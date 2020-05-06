@@ -31,16 +31,18 @@ const actions = {
     if (simulation.data && simulation.data.done) {
       simulation.past_runs.push(simulation.data)
     }
-    simulation.data = simulation.reset()
+    simulation.data = simulation.reset(simulation.data || {})
     simulation.data.step = 0
     store.setState({ simulation })
     store.actions.step()
   },
   step: (store) => {
-    const { step, data } = store.state.simulation
+    const { step, data, finish = () => {} } = store.state.simulation
     step(data, store.state.formData)
     store.setState({ step })
-    if (!data.done) {
+    if (data.done) {
+      finish(store.state.simulation)
+    } else {
       clearTimeout(timeout)
       timeout = setTimeout(
         store.actions.step,

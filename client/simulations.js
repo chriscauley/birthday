@@ -49,7 +49,7 @@ const getMetaOptions = () => {
         },
       },
     },
-    metaInitial: { step_delay: 1000 },
+    metaInitial: { step_delay: 0 },
   }
 }
 
@@ -83,6 +83,10 @@ Simulation({
 Simulation({
   title: 'Same Day of Month',
   reset: () => ({ room: {} }),
+  completed: [],
+  finish: (simulation) => {
+    simulation.completed.push(Object.keys(simulation.data.room).length)
+  },
   step: (data) => {
     const new_day = math.randomBday({ days: 30 })
     if (data.room[new_day]) {
@@ -115,12 +119,51 @@ Simulation({
             <div>
               Birthday collision: {simulation.data.done ? 'Yes!' : 'No'}
             </div>
+            {simulation.completed.length > 0 && (
+              <Histogram
+                values={simulation.completed}
+                x_label="number_of_people"
+                y_label="count"
+              />
+            )}
           </div>
         )}
       </>
     )
   },
 })
+
+const Histogram = ({ values, x_label, y_label, normalized = false }) => {
+  const data = {
+    x_max: Math.max(...values),
+    x_min: 0, // Math.min(...values),
+  }
+  data.counts = range(data.x_max + 1).map(() => 0)
+  values.forEach((v) => data.counts[v]++)
+  data.y_max = Math.max(...data.counts)
+  const y_cumulative_label = y_label + '__cumulative'
+  let cumulative = 0
+  data.results = data.counts.map((y, x) => {
+    if (x < data.x_min) {
+      return
+    }
+    if (normalized) {
+      y = y / data.y_max
+    }
+    cumulative += y
+    return { [y_label]: y, [x_label]: x, [y_cumulative_label]: cumulative }
+  })
+  return (
+    <div className="flex">
+      <VictoryChart>
+        <VictoryBar data={data.results} y={y_label} x={x_label} />
+      </VictoryChart>
+      <VictoryChart>
+        <VictoryBar data={data.results} y={y_cumulative_label} x={x_label} />
+      </VictoryChart>
+    </div>
+  )
+}
 
 Simulation({
   title: 'Day of Year Collision Probability',
