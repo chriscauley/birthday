@@ -22,6 +22,9 @@ const actions = {
   },
   runSimulation: (store) => {
     const { simulation } = store.state
+    if (simulation.data && simulation.data.done) {
+      simulation.past_runs.push(simulation.data)
+    }
     simulation.data = simulation.reset()
     simulation.data.step = 0
     store.setState({ simulation })
