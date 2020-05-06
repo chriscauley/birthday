@@ -2,18 +2,18 @@ import React from 'react'
 import css from '@unrest/css'
 
 import { withConfig } from './Sidebar'
-import steps from './steps'
+import simulations from './simulations'
 
 export default withConfig(function Home(props) {
-  const simulation = steps.find((s) => s.key === props.match.params.step_number)
+  const simulation = simulations.find((s) => s.key === props.match.params.simulation_number)
   if (!simulation) {
     return (
       <div>
-        <div>Choose a step to begin</div>
-        {steps.map((step) => (
-          <div key={step.key}>
-            <a href={`/${step.key}/`} className={css.link()}>
-              {step.title}
+        <div>Choose a simulation to begin</div>
+        {simulations.map((simulation) => (
+          <div key={simulation.key}>
+            <a href={`/${simulation.key}/`} className={css.link()}>
+              {simulation.title}
             </a>
           </div>
         ))}
@@ -21,5 +21,5 @@ export default withConfig(function Home(props) {
     )
   }
   props.config.setSimulation(simulation)
-  return <div className="w-2/3 home">{simulation.render(simulation)}</div>
+  return <div className="home">{simulation.render(simulation)}</div>
 })

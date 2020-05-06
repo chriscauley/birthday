@@ -31,17 +31,17 @@ const MonthCalendar = (props) => {
   )
 }
 
-const steps = []
-export default steps
+const simulations = []
+export default simulations
 
-const Step = (step) => {
-  steps.push(step)
-  step.key = `${steps.length}-${slugify(step.title)}`
-  step.past_runs = []
-  return step
+const Simulation = (simulation) => {
+  simulations.push(simulation)
+  simulation.key = `${simulations.length}-${slugify(simulation.title)}`
+  simulation.past_runs = []
+  return simulation
 }
 
-Step({
+Simulation({
   title: 'Same Day of Month',
   reset: () => ({ room: {} }),
   step: (data) => {
@@ -82,7 +82,7 @@ Step({
   },
 })
 
-Step({
+Simulation({
   title: 'Day of Year Collision Probability',
   schema: {
     type: 'object',

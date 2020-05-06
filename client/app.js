@@ -12,12 +12,14 @@ const App = () => {
       <BrowserRouter>
         <Nav />
         <div className="p-4" style={{ minHeight: 'calc(100vh - 230px)' }}>
-          <div className="flex">
-            <div className="w-1/3">
+          <div className="flex -mx-2">
+            <div className="w-1/3 px-2">
               <Sidebar />
             </div>
-            <Route path="/:step_number/" component={Home} />
-            <Route exact path="/" component={Home} />
+            <div className="w-2/3 px-2">
+              <Route path="/:simulation_number/" component={Home} />
+              <Route exact path="/" component={Home} />
+            </div>
           </div>
         </div>
       </BrowserRouter>

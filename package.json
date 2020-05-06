@@ -16,6 +16,7 @@
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/preset-env": "^7.9.5",
+    "@unrest/core": "^0.0.1",
     "@unrest/css": "^0.0.3",
     "@unrest/react-jsonschema-form": "^0.0.1",
     "@unrest/tailwind": "^0.0.1",
