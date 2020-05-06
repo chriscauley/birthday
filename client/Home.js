@@ -1,22 +1,17 @@
 import React from 'react'
 import { VictoryBar, VictoryChart } from 'victory'
+
+import { withConfig } from './Sidebar'
 import * as math from './math'
 
-export default function Home() {
-  const data = math.simulation(math.config)
+export default withConfig(function Home(props) {
+  const { formData } = props.config
+  const data = math.simulation(formData)
   return (
     <div>
       <VictoryChart>
-        <VictoryBar
-          data={data}
-          // data accessor for x values
-          ax="quarter"
-          // data accessor for y values
-          ay="earnings"
-          y="fraction_of_rooms"
-          x="day_of_year"
-        />
+        <VictoryBar data={data} y="fraction_of_rooms" x="day_of_year" />
       </VictoryChart>
     </div>
   )
-}
+})

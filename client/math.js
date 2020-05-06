@@ -1,11 +1,5 @@
 import { range } from 'lodash'
 
-export const config = {
-  days: 365,
-  n_rooms: 50000,
-  x_range: 75,
-}
-
 export const randomBday = (config) => {
   // A new person enters room, what is their birthday?
   const bday = Math.floor(Math.random() * config.days)

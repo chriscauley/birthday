@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter, Route } from 'react-router-dom'
 
 import Home from './Home'
+import { Sidebar } from './Sidebar'
 import Nav from './Nav'
 
 const App = () => {
@@ -11,7 +12,12 @@ const App = () => {
       <BrowserRouter>
         <Nav />
         <div className="p-4" style={{ minHeight: 'calc(100vh - 230px)' }}>
-          <Route exact path="/" component={Home} />
+          <div className="flex">
+            <div className="w-1/3">
+              <Sidebar />
+            </div>
+            <Route exact path="/" component={Home} />
+          </div>
         </div>
       </BrowserRouter>
     </div>
