@@ -74,12 +74,7 @@ export const schema = {
 }
 
 export const Sidebar = withConfig((props) => {
-  const {
-    formData,
-    simulation,
-    setState,
-    runSimulation,
-  } = props.config
+  const { formData, simulation, setState, runSimulation } = props.config
   if (!simulation) {
     return null
   }

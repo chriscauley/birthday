@@ -7,7 +7,7 @@ export default function Nav() {
     <header className={css.nav.outer()}>
       <section className={css.nav.section()}>
         <Link to="/" className={css.nav.brand()}>
-          Noticed
+          Birthday Paradox
         </Link>
       </section>
       <section className={css.nav.section('flex items-center')}>
