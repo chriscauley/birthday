@@ -9,5 +9,9 @@ export default withConfig(function Home(props) {
     simulations.find((s) => s.key === params.simulation_number) ||
     simulations[0]
   props.config.setSimulation(simulation)
-  return <div className="home">{simulation.render(simulation)}</div>
+  return (
+    <div className="home">
+      {simulation.render(simulation, props.config.results)}
+    </div>
+  )
 })

@@ -2,6 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { Dropdown } from '@unrest/core'
+import storage, { keyring } from './storage'
 import css from '@unrest/css'
 import Form from '@unrest/react-jsonschema-form'
 import globalHook from 'use-global-hook'
@@ -13,41 +14,58 @@ let timeout
 const actions = {
   setSimulation: (store, simulation) => {
     if (store.state.simulation.key !== simulation.key) {
+      const configData =
+        storage.get(keyring.configData(simulation)) || simulation.initial
       setTimeout(() =>
         store.setState({
           simulation,
-          formData: simulation.initial,
-          metaSettings: simulation.metaInitial,
+          configData,
+          metaData:
+            storage.get(keyring.metaData(simulation)) || simulation.metaInitial,
+          results: storage.get(keyring.results(simulation, configData)) || [],
         }),
       )
     }
   },
-  setState: (store, state) => {
-    store.setState(state)
-    state.formData && store.actions.simulate()
+  setState: (store, new_state) => {
+    store.setState(new_state)
+
+    // save setting in local storage for reloading
+    Object.entries(new_state).forEach(([key, value]) => {
+      if (keyring[key]) {
+        const storage_key = keyring[key](
+          store.state.simulation,
+          new_state.configData || store.state.configData,
+        )
+        storage.set(storage_key, value)
+      }
+    })
+
+    // TODO this should be auto run or something
+    // start simulation if it has configData
+    new_state.configData && store.actions.simulate()
   },
   runSimulation: (store) => {
     const { simulation } = store.state
     if (simulation.data && simulation.data.done) {
       simulation.past_runs.push(simulation.data)
     }
-    simulation.data = simulation.reset(simulation.data || {})
+    simulation.data = simulation.reset()
     simulation.data.step = 0
     store.setState({ simulation })
     store.actions.step()
   },
   step: (store) => {
     const { step, data, finish = () => {} } = store.state.simulation
-    step(data, store.state.formData)
+    step(data, store.state.configData)
     store.setState({ step })
     if (data.done) {
-      finish(store.state.simulation)
+      const { results } = store.state
+      finish(store.state.simulation, results)
+      store.actions.setState({ results })
     } else {
       clearTimeout(timeout)
-      timeout = setTimeout(
-        store.actions.step,
-        store.state.metaSettings.step_delay,
-      )
+      timeout = setTimeout(store.actions.step, store.state.metaData.step_delay)
     }
   },
   simulate: debounce((store) => {
@@ -80,8 +98,8 @@ const uiSchema = {
 export const Sidebar = withRouter(
   withConfig((props) => {
     const {
-      formData,
-      metaSettings,
+      configData,
+      metaData,
       simulation,
       setState,
       runSimulation,
@@ -101,8 +119,8 @@ export const Sidebar = withRouter(
         {schema && (
           <Form
             uiSchema={uiSchema}
-            formData={formData}
-            onChange={(formData) => setState({ formData })}
+            formData={configData}
+            onChange={(configData) => setState({ configData })}
             schema={schema}
             customButton={true}
           />
@@ -110,8 +128,8 @@ export const Sidebar = withRouter(
         {metaSchema && (
           <Form
             uiSchema={uiSchema}
-            formData={metaSettings}
-            onChange={(metaSettings) => setState({ metaSettings })}
+            formData={metaData}
+            onChange={(metaData) => setState({ metaData })}
             schema={metaSchema}
             customButton={true}
           />

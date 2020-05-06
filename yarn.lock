@@ -964,6 +964,11 @@
   resolved "https://registry.yarnpkg.com/@unrest/react-jsonschema-form/-/react-jsonschema-form-0.0.1.tgz#d8cbabb02e06781d23fd9ec0b1a986db865b6d47"
   integrity sha512-Y8OKRcPW+2/IxMkZkAhUoJl5MyhzTX1twwI1566HmwvUr6Oa+oFr/uyKEnmI0LyQ8LS+eZJ+/sMZYtcs8SRuvw==
 
+"@unrest/storage@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@unrest/storage/-/storage-0.1.0.tgz#cb18a1c376c32e9adad2d39c277c5f0ed6c6eb9a"
+  integrity sha512-DOTGsw89/4odwq3Y+2k6c/CxiBCSleajhOjY60rTm+TQqfEG4ODhY5F/skaeoKmBShyVl0xU4METtW7ifJv9Ow==
+
 "@unrest/tailwind@^0.0.1":
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/@unrest/tailwind/-/tailwind-0.0.1.tgz#c7272fb668fbe0016797da802d647ea7e792843b"

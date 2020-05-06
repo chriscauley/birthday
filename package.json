@@ -19,6 +19,7 @@
     "@unrest/core": "^0.0.1",
     "@unrest/css": "^0.0.3",
     "@unrest/react-jsonschema-form": "^0.0.1",
+    "@unrest/storage": "^0.1.0",
     "@unrest/tailwind": "^0.0.1",
     "classnames": "^2.2.6",
     "date-fns": "^2.12.0",

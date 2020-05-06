@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { range } from 'lodash'
 import { VictoryBar, VictoryChart } from 'victory'
 import slugify from 'slugify'
@@ -54,9 +55,9 @@ const getMetaOptions = () => {
 }
 
 const Simulation = (simulation) => {
-  simulation.number = simulations.length
-  simulation.title = `${simulation.number}. ${simulation.title}`
-  simulation.key = slugify(simulation.title)
+  simulation.id = simulations.length
+  simulation.title = `${simulation.id}. ${simulation.title}`
+  simulation.key = slugify(`${simulation.id} ${simulation.title}`)
   simulation.past_runs = []
   simulations.push(simulation)
   return simulation
@@ -68,11 +69,11 @@ Simulation({
     return (
       <div>
         <div>Choose a simulation to begin</div>
-        {simulations.map((simulation) => (
+        {simulations.slice(1).map((simulation) => (
           <div key={simulation.key}>
-            <a href={`/${simulation.key}/`} className={css.link()}>
+            <Link to={`/${simulation.key}/`} className={css.link()}>
               {simulation.title}
-            </a>
+            </Link>
           </div>
         ))}
       </div>
@@ -83,9 +84,9 @@ Simulation({
 Simulation({
   title: 'Same Day of Month',
   reset: () => ({ room: {} }),
-  completed: [],
-  finish: (simulation) => {
-    simulation.completed.push(Object.keys(simulation.data.room).length)
+  finish: (simulation, results) => {
+    // people in room is one more than room length (since one spot is double occupied)
+    results.push(Object.keys(simulation.data.room).length + 1)
   },
   step: (data) => {
     const new_day = math.randomBday({ days: 30 })
@@ -97,7 +98,7 @@ Simulation({
     data.room[new_day] = data.step
   },
   ...getMetaOptions(),
-  render(simulation, _store) {
+  render(simulation, results = []) {
     return (
       <>
         <p>
@@ -114,19 +115,19 @@ Simulation({
         {simulation.data && (
           <div>
             <div>
-              People in room: {Object.keys(simulation.data.room).length}
+              People in room: {Object.keys(simulation.data.room).length + 1}
             </div>
             <div>
               Birthday collision: {simulation.data.done ? 'Yes!' : 'No'}
             </div>
-            {simulation.completed.length > 0 && (
-              <Histogram
-                values={simulation.completed}
-                x_label="number_of_people"
-                y_label="count"
-              />
-            )}
           </div>
+        )}
+        {results.length > 0 && (
+          <Histogram
+            values={results}
+            x_label="number_of_people"
+            y_label="count"
+          />
         )}
       </>
     )
@@ -186,8 +187,8 @@ Simulation({
   },
   ...getMetaOptions(),
   reset: () => ({}),
-  step: (data, formData) => {
-    data.results = math.simulation(formData)
+  step: (data, configData) => {
+    data.results = math.simulation(configData)
     data.done = true
   },
   render(simulation, _store) {
