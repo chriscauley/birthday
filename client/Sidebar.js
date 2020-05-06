@@ -1,18 +1,47 @@
 import React from 'react'
-import { isEqual, debounce } from 'lodash'
+import { debounce } from 'lodash'
 import Form from '@unrest/react-jsonschema-form'
 import globalHook from 'use-global-hook'
 
+let simulation
+let timeout
+
+const step_time = 1000
+
 const actions = {
-  setInitial: (store, initial) => {
-    if (!isEqual(store.state.initial, initial)) {
-      store.setState({ initial, formData: initial })
+  setSimulation: (store, simulation) => {
+    if (store.state.simulation.key !== simulation.key) {
+      setTimeout(() =>
+        store.setState({ simulation, formData: simulation.initial }),
+      )
     }
   },
-  setState: (store, state) => store.setState(state),
+  setState: (store, state) => {
+    store.setState(state)
+    store.actions.simulate()
+  },
+  runSimulation: (store) => {
+    const { simulation } = store.state
+    simulation.data = simulation.reset()
+    simulation.data.step = 0
+    store.setState({ simulation })
+    store.actions.step()
+  },
+  step: (store) => {
+    const { step, data } = store.state.simulation
+    step(data, store.state.formData)
+    store.setState(simulation)
+    if (!data.done) {
+      clearTimeout(timeout)
+      timeout = setTimeout(store.actions.step, step_time)
+    }
+  },
+  simulate: debounce((store) => {
+    store.actions.runSimulation()
+  }),
 }
 
-const makeHook = globalHook(React, {}, actions)
+const makeHook = globalHook(React, { simulation: {} }, actions)
 
 export const withConfig = (Component) => {
   return function ConfigProvider(props) {
@@ -31,7 +60,7 @@ const uiSchema = {
   },
 }
 
-const schema = {
+export const schema = {
   type: 'object',
   properties: {
     days: {
@@ -45,21 +74,30 @@ const schema = {
 }
 
 export const Sidebar = withConfig((props) => {
-  const { formData, initial, setState, setInitial } = props.config
-  const onChange = debounce((formData) => setState({ formData }), 1000)
-  setInitial({
-    days: 365,
-    n_rooms: 50000,
-    x_range: 75,
-  })
+  const {
+    formData,
+    simulation,
+    setState,
+    runSimulation,
+  } = props.config
+  if (!simulation) {
+    return null
+  }
+  const { schema, initial } = simulation
+  const onChange = (formData) => setState({ formData })
   return (
-    <Form
-      initial={initial}
-      uiSchema={uiSchema}
-      formData={formData}
-      onChange={onChange}
-      schema={schema}
-      customButton={true}
-    />
+    <div>
+      {schema && (
+        <Form
+          initial={initial}
+          uiSchema={uiSchema}
+          formData={formData}
+          onChange={onChange}
+          schema={schema}
+          customButton={true}
+        />
+      )}
+      <button onClick={runSimulation}>Run Simulation</button>
+    </div>
   )
 })
