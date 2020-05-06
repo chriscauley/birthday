@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter, Route } from 'react-router-dom'
+import { HashRouter, Route } from 'react-router-dom'
 
 import Home from './Home'
 import { Sidebar } from './Sidebar'
@@ -9,7 +9,7 @@ import Nav from './Nav'
 const App = () => {
   return (
     <div className="container mx-auto">
-      <BrowserRouter>
+      <HashRouter>
         <Nav />
         <div className="p-4" style={{ minHeight: 'calc(100vh - 230px)' }}>
           <div className="flex -mx-2">
@@ -22,7 +22,7 @@ const App = () => {
             </div>
           </div>
         </div>
-      </BrowserRouter>
+      </HashRouter>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import { range } from 'lodash'
 import { VictoryBar, VictoryChart } from 'victory'
 import slugify from 'slugify'
+import css from '@unrest/css'
 import classnames from 'classnames'
 
 import * as math from './math'
@@ -34,12 +35,50 @@ const MonthCalendar = (props) => {
 const simulations = []
 export default simulations
 
+const getMetaOptions = () => {
+  return {
+    metaSchema: {
+      type: 'object',
+      properties: {
+        step_delay: {
+          title: 'Step Delay (ms)',
+          type: 'integer',
+          minimum: 0,
+          maximum: 1000,
+          multipleOf: 100,
+        },
+      },
+    },
+    metaInitial: { step_delay: 1000 },
+  }
+}
+
 const Simulation = (simulation) => {
-  simulations.push(simulation)
-  simulation.key = `${simulations.length}-${slugify(simulation.title)}`
+  simulation.number = simulations.length
+  simulation.title = `${simulation.number}. ${simulation.title}`
+  simulation.key = slugify(simulation.title)
   simulation.past_runs = []
+  simulations.push(simulation)
   return simulation
 }
+
+Simulation({
+  title: 'Introduction',
+  render() {
+    return (
+      <div>
+        <div>Choose a simulation to begin</div>
+        {simulations.map((simulation) => (
+          <div key={simulation.key}>
+            <a href={`/${simulation.key}/`} className={css.link()}>
+              {simulation.title}
+            </a>
+          </div>
+        ))}
+      </div>
+    )
+  },
+})
 
 Simulation({
   title: 'Same Day of Month',
@@ -53,6 +92,7 @@ Simulation({
     data.step++
     data.room[new_day] = data.step
   },
+  ...getMetaOptions(),
   render(simulation, _store) {
     return (
       <>
@@ -96,12 +136,13 @@ Simulation({
       x_range: { type: 'integer' },
     },
   },
-  reset: () => ({}),
   initial: {
     days: 365,
     n_rooms: 3000,
     x_range: 50,
   },
+  ...getMetaOptions(),
+  reset: () => ({}),
   step: (data, formData) => {
     data.results = math.simulation(formData)
     data.done = true

@@ -1,24 +1,30 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 import { debounce } from 'lodash'
+import { Dropdown } from '@unrest/core'
+import css from '@unrest/css'
 import Form from '@unrest/react-jsonschema-form'
 import globalHook from 'use-global-hook'
 
-let simulation
-let timeout
+import simulations from './simulations'
 
-const step_time = 1000
+let timeout
 
 const actions = {
   setSimulation: (store, simulation) => {
     if (store.state.simulation.key !== simulation.key) {
       setTimeout(() =>
-        store.setState({ simulation, formData: simulation.initial }),
+        store.setState({
+          simulation,
+          formData: simulation.initial,
+          metaSettings: simulation.metaInitial,
+        }),
       )
     }
   },
   setState: (store, state) => {
     store.setState(state)
-    store.actions.simulate()
+    state.formData && store.actions.simulate()
   },
   runSimulation: (store) => {
     const { simulation } = store.state
@@ -33,10 +39,13 @@ const actions = {
   step: (store) => {
     const { step, data } = store.state.simulation
     step(data, store.state.formData)
-    store.setState(simulation)
+    store.setState({ step })
     if (!data.done) {
       clearTimeout(timeout)
-      timeout = setTimeout(store.actions.step, step_time)
+      timeout = setTimeout(
+        store.actions.step,
+        store.state.metaSettings.step_delay,
+      )
     }
   },
   simulate: debounce((store) => {
@@ -61,41 +70,56 @@ const uiSchema = {
   days: {
     'ui:widget': 'range',
   },
-}
-
-export const schema = {
-  type: 'object',
-  properties: {
-    days: {
-      type: 'integer',
-      minimum: 15,
-      maximum: 365,
-    },
-    n_rooms: { type: 'integer' },
-    x_range: { type: 'integer' },
+  step_delay: {
+    'ui:widget': 'range',
   },
 }
 
-export const Sidebar = withConfig((props) => {
-  const { formData, simulation, setState, runSimulation } = props.config
-  if (!simulation) {
-    return null
-  }
-  const { schema, initial } = simulation
-  const onChange = (formData) => setState({ formData })
-  return (
-    <div>
-      {schema && (
-        <Form
-          initial={initial}
-          uiSchema={uiSchema}
-          formData={formData}
-          onChange={onChange}
-          schema={schema}
-          customButton={true}
-        />
-      )}
-      <button onClick={runSimulation}>Run Simulation</button>
-    </div>
-  )
-})
+export const Sidebar = withRouter(
+  withConfig((props) => {
+    const {
+      formData,
+      metaSettings,
+      simulation,
+      setState,
+      runSimulation,
+    } = props.config
+    if (!simulation) {
+      return null
+    }
+    const { schema, metaSchema } = simulation
+    const dropdown_links = simulations.map((s) => ({
+      children: s.title,
+      to: `/${s.key}/`,
+    }))
+    return (
+      <div>
+        <Dropdown links={dropdown_links}>{simulation.title}</Dropdown>
+        <div className="border-b m-4" />
+        {schema && (
+          <Form
+            uiSchema={uiSchema}
+            formData={formData}
+            onChange={(formData) => setState({ formData })}
+            schema={schema}
+            customButton={true}
+          />
+        )}
+        {metaSchema && (
+          <Form
+            uiSchema={uiSchema}
+            formData={metaSettings}
+            onChange={(metaSettings) => setState({ metaSettings })}
+            schema={metaSchema}
+            customButton={true}
+          />
+        )}
+        {simulation.reset && (
+          <button onClick={runSimulation} className={css.button()}>
+            Run Simulation
+          </button>
+        )}
+      </div>
+    )
+  }),
+)
