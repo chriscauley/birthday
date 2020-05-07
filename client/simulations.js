@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { range } from 'lodash'
-import { VictoryBar, VictoryChart } from 'victory'
 import slugify from 'slugify'
 import css from '@unrest/css'
 import classnames from 'classnames'
@@ -98,7 +97,7 @@ Simulation({
     data.room[new_day] = data.step
   },
   ...getMetaOptions(),
-  render(simulation, results = []) {
+  render(simulation) {
     return (
       <>
         <p>
@@ -122,49 +121,10 @@ Simulation({
             </div>
           </div>
         )}
-        {results.length > 0 && (
-          <Histogram
-            values={results}
-            x_label="number_of_people"
-            y_label="count"
-          />
-        )}
       </>
     )
   },
 })
-
-const Histogram = ({ values, x_label, y_label, normalized = false }) => {
-  const data = {
-    x_max: Math.max(...values),
-    x_min: 0, // Math.min(...values),
-  }
-  data.counts = range(data.x_max + 1).map(() => 0)
-  values.forEach((v) => data.counts[v]++)
-  data.y_max = Math.max(...data.counts)
-  const y_cumulative_label = y_label + '__cumulative'
-  let cumulative = 0
-  data.results = data.counts.map((y, x) => {
-    if (x < data.x_min) {
-      return
-    }
-    if (normalized) {
-      y = y / data.y_max
-    }
-    cumulative += y
-    return { [y_label]: y, [x_label]: x, [y_cumulative_label]: cumulative }
-  })
-  return (
-    <div className="flex">
-      <VictoryChart>
-        <VictoryBar data={data.results} y={y_label} x={x_label} />
-      </VictoryChart>
-      <VictoryChart>
-        <VictoryBar data={data.results} y={y_cumulative_label} x={x_label} />
-      </VictoryChart>
-    </div>
-  )
-}
 
 Simulation({
   title: 'Day of Year Collision Probability',
@@ -187,24 +147,17 @@ Simulation({
   },
   ...getMetaOptions(),
   reset: () => ({}),
+  finish(simulation, results) {
+    simulation.data.results.forEach((r) => results.push(r))
+  },
   step: (data, configData) => {
-    data.results = math.simulation(configData)
+    data.results = math.simulateRooms(configData)
     data.done = true
   },
   render(simulation, _store) {
     if (!simulation.data || !simulation.data.results) {
       return null
     }
-    return (
-      <div>
-        <VictoryChart>
-          <VictoryBar
-            data={simulation.data.results}
-            y="fraction_of_rooms"
-            x="day_of_year"
-          />
-        </VictoryChart>
-      </div>
-    )
+    return <div></div>
   },
 })

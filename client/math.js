@@ -20,19 +20,7 @@ export const simulateRoom = (config) => {
   return { n_people: i, room }
 }
 
-export const simulation = (config) => {
+export const simulateRooms = (config) => {
   // simulate a lot of rooms and count how many people are in each room until hash collision
-  const number_of_people = range(config.days).map(() => 0)
-  range(config.n_rooms).forEach(() => {
-    const people_until_match = simulateRoom(config).n_people
-    range(people_until_match, config.days).forEach((i) => number_of_people[i]++)
-  })
-  const data = number_of_people.map((number_of_rooms, day_of_year) => {
-    return {
-      number_of_rooms,
-      day_of_year,
-      fraction_of_rooms: number_of_rooms / config.n_rooms,
-    }
-  })
-  return data.slice(0, config.x_range)
+  return range(config.n_rooms).map(() => simulateRoom(config).n_people)
 }
