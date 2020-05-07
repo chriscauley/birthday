@@ -28,13 +28,21 @@ export default function Histogram({
     return { [y_label]: y, [x_label]: x, [y_cumulative_label]: cumulative }
   })
   return (
-    <div className="flex">
-      <VictoryChart>
-        <VictoryBar data={data.results} y={y_label} x={x_label} />
-      </VictoryChart>
-      <VictoryChart>
-        <VictoryBar data={data.results} y={y_cumulative_label} x={x_label} />
-      </VictoryChart>
-    </div>
+    <>
+      <div className="flex">
+        <div className="w-1/2 text-center">People before collision</div>
+        <div className="w-1/2 text-center">
+          People before collision (cumulative)
+        </div>
+      </div>
+      <div className="flex">
+        <VictoryChart>
+          <VictoryBar data={data.results} y={y_label} x={x_label} />
+        </VictoryChart>
+        <VictoryChart>
+          <VictoryBar data={data.results} y={y_cumulative_label} x={x_label} />
+        </VictoryChart>
+      </div>
+    </>
   )
 }
